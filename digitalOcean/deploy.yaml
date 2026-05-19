@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: convesaotemperatura
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: convesaotemperatura
+  template:
+    metadata:
+      labels:
+        app: convesaotemperatura
+    spec:
+      containers:
+      - name: convesaotemperatura
+        image: jronca/conversao-temperatura:v1
+        ports:
+          - name: http
+            containerPort: 8080
+            protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: convesaotemperatura
+spec:
+  selector:
+    app: convesaotemperatura
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+      nodePort: 30000
