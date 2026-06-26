@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goproxy-pod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: goproxy-pod
+  template:
+    metadata:
+      labels:
+        app: goproxy-pod
+    spec:
+      containers:
+      - name: goproxy-pod
+        image: registry.k8s.io/goproxy:0.1
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 1
+          successThreshold: 1
+          timeoutSeconds: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: goproxy-pod
+spec:
+  selector:
+    app: goproxy-pod
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 3000
+    name: http
+    protocol: TCP
+    nodePort: 30000
